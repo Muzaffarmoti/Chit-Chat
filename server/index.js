@@ -8,7 +8,7 @@ const app = express();
 require("dotenv").config();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json() );
 
 app.use("/api/auth",userRoutes);
 app.use("/api/messages",messageRoute);
