@@ -33,7 +33,7 @@ const io = socket(server,{
         // origin: "http://localhost:3000",
         // // origin: "https://chit-chat-21.netlify.app/",
         origin: process.env.NODE_ENV === "production"
-        ? "https://chit-chat-21.netlify.app"
+        ? "https://66f9a61eab61c2448d2c3e7f--chit-chat-21.netlify.app/"
         : "http://localhost:3000",
         credentials: true,
     },
