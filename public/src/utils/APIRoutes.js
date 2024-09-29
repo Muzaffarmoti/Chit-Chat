@@ -1,5 +1,9 @@
 // export const host = "http://localhost:5000";
-export const host = "https://chit-chat-g5xb.onrender.com";
+// export const host = "https://chit-chat-g5xb.onrender.com ";
+export const host = process.env.NODE_ENV === "production" 
+    ? "https://chit-chat-g5xb.onrender.com" 
+    : "http://localhost:5000";
+
 export const registerRoute = `${host}/api/auth/register`;
 export const loginRoute = `${host}/api/auth/login`;
 export const SetAvatarRoute = `${host}/api/auth/SetAvatar`;

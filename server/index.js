@@ -31,7 +31,10 @@ const server = app.listen(process.env.PORT,()=>{
 const io = socket(server,{
     cors:{
         // origin: "http://localhost:3000",
-        origin: "https://chit-chat-21.netlify.app/",
+        // // origin: "https://chit-chat-21.netlify.app/",
+        origin: process.env.NODE_ENV === "production"
+        ? "https://chit-chat-21.netlify.app"
+        : "http://localhost:3000",
         credentials: true,
     },
 });
