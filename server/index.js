@@ -7,48 +7,47 @@ const socket = require("socket.io");
 const app = express(); 
 require("dotenv").config();
 
+// Allowed origins for CORS
 const allowedOrigins = [
-    "https://chit-chat-21.netlify.app", // Add your Netlify URL
+    "https://chit-chat-21.netlify.app", // Production Netlify URL
     "http://localhost:3000" // Local development
 ];
 
+// Apply CORS configuration
 app.use(cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+        // Allow requests with no origin, like mobile apps or curl requests
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
     credentials: true,
 }));
 
-app.use(cors());
-app.use(express.json() );
+app.use(express.json());
 
-app.use("/api/auth",userRoutes);
-app.use("/api/messages",messageRoute);
+app.use("/api/auth", userRoutes);
+app.use("/api/messages", messageRoute);
 
-
-mongoose.connect(process.env.MONGO_URL,{
+// MongoDB connection
+mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {
     console.log("DB Connection Successful");
-})
-.catch((err)=>{
+}).catch((err) => {
     console.log(err.message);
-}) 
-
-const server = app.listen(process.env.PORT,()=>{
-    console.log(`Server Started on port ${process.env.PORT}`);
 });
 
-// const io = socket(server,{
-//     cors:{
-//         // origin: "http://localhost:3000",
-//         // // origin: "https://chit-chat-21.netlify.app/",
-//         origin: process.env.NODE_ENV === "production"
-//         ? "https://66f9a61eab61c2448d2c3e7f--chit-chat-21.netlify.app"
-//         : "http://localhost:3000",
-//         credentials: true,
-//     },
-// });
+// Start server
+const server = app.listen(process.env.PORT, () => {
+    console.log(`Server started on port ${process.env.PORT}`);
+});
 
+// Setup Socket.io with proper CORS for WebSockets
 const io = socket(server, {
     cors: {
         origin: allowedOrigins,
@@ -58,31 +57,33 @@ const io = socket(server, {
 
 global.onlineUsers = new Map();
 
-io.on("connection",(socket)=>{
+io.on("connection", (socket) => {
     global.chatSocket = socket;
-    socket.on("add-user",(userId)=>{
-        onlineUsers.set(userId,socket.id);
+
+    // Handle adding a user
+    socket.on("add-user", (userId) => {
+        onlineUsers.set(userId, socket.id);
         console.log(`User added: ${userId}`);
     });
 
-    socket.on("send-msg",(data)=>{
+    // Handle sending messages
+    socket.on("send-msg", (data) => {
         const sendUserSocket = onlineUsers.get(data.to);
-        if(sendUserSocket){   
-            console.log(`Message sent to ${data.to}: ${data.message}`); 
+        if (sendUserSocket) {
+            socket.to(sendUserSocket).emit("msg-recieve", data.message);
+            console.log(`Message sent to ${data.to}: ${data.message}`);
         } else {
-            console.log(`User ${data.to} is not online.`); // Log if user is offline
+            console.log(`User ${data.to} is not online.`);
         }
     });
+
+    // Handle user disconnection
     socket.on("disconnect", () => {
         onlineUsers.forEach((value, key) => {
             if (value === socket.id) {
                 onlineUsers.delete(key);
-                console.log(`User disconnected: ${key}`); //debugging
+                console.log(`User disconnected: ${key}`);
             }
         });
     });
-})
-
-
-
-
+});
