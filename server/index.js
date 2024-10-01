@@ -33,7 +33,7 @@ const io = socket(server,{
         // origin: "http://localhost:3000",
         // // origin: "https://chit-chat-21.netlify.app/",
         origin: process.env.NODE_ENV === "production"
-        ? "https://66f9a61eab61c2448d2c3e7f--chit-chat-21.netlify.app/"
+        ? "https://66f9a61eab61c2448d2c3e7f--chit-chat-21.netlify.app"
         : "http://localhost:3000",
         credentials: true,
     },
@@ -45,14 +45,25 @@ io.on("connection",(socket)=>{
     global.chatSocket = socket;
     socket.on("add-user",(userId)=>{
         onlineUsers.set(userId,socket.id);
+        console.log(`User added: ${userId}`);
     });
 
     socket.on("send-msg",(data)=>{
         const sendUserSocket = onlineUsers.get(data.to);
         if(sendUserSocket){   
-            socket.to(sendUserSocket).emit("msg-recieve",data.message);
+            onsole.log(`Message sent to ${data.to}: ${data.message}`); // Log for debugging
+        } else {
+            console.log(`User ${data.to} is not online.`); // Log if user is offline
         }
-    })
+    });
+    socket.on("disconnect", () => {
+        onlineUsers.forEach((value, key) => {
+            if (value === socket.id) {
+                onlineUsers.delete(key);
+                console.log(`User disconnected: ${key}`); // Log for debugging
+            }
+        });
+    });
 })
 
 
