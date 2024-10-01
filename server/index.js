@@ -68,7 +68,7 @@ io.on("connection",(socket)=>{
     socket.on("send-msg",(data)=>{
         const sendUserSocket = onlineUsers.get(data.to);
         if(sendUserSocket){   
-            onsole.log(`Message sent to ${data.to}: ${data.message}`); // Log for debugging
+            console.log(`Message sent to ${data.to}: ${data.message}`); 
         } else {
             console.log(`User ${data.to} is not online.`); // Log if user is offline
         }
@@ -77,7 +77,7 @@ io.on("connection",(socket)=>{
         onlineUsers.forEach((value, key) => {
             if (value === socket.id) {
                 onlineUsers.delete(key);
-                console.log(`User disconnected: ${key}`); // Log for debugging
+                console.log(`User disconnected: ${key}`); //debugging
             }
         });
     });
