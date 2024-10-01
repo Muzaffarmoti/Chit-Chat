@@ -1,4 +1,4 @@
-# Chit-Chat
+# Chit-Chat https://chit-chat-21.netlify.app/
 Chit-Chat application MERN project
 Developed a real-time chat web application featuring user login and registration. Utilized Socket.io for instant message transmission, ReactJS for a responsive and intuitive front-end, and NodeJS with Express for a robust back-end. MongoDB was employed for efficient database management. The project highlights my expertise in full-stack development, real-time communication, and secure user authentication processes.
 ![Screenshot 2024-06-09 145132](https://github.com/Muzaffarmoti/Chit-Chat/assets/103826392/56e32511-2673-4a80-80be-2b640a97b4f8)
